@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="css/eui.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+<h1></h1>
+
+<div id = "app">
+    <!--页头组件-->
+    <el-page-header style="background-color: #0095d7;color:white;line-height: 60px" @back="goBack" content = "发布商品页面"></el-page-header>
+    <el-divider></el-divider>
+
+<el-card>
+    <el-form>
+        <el-form-item label = "商品标题" label-width = "80px">
+            <el-input v-model ="product.title"></el-input>
+        </el-form-item>
+        <el-form-item label = "价格" label-width = "80px">
+            <el-input v-model ="product.price"></el-input>
+        </el-form-item>
+        <el-form-item label = "原价" label-width = "80px">
+            <el-input v-model ="product.oldPrice"></el-input>
+        </el-form-item>
+        <el-form-item label = "商品销量" label-width = "80px">
+            <el-input v-model ="product.saleCount"></el-input>
+        </el-form-item>
+        <el-form-item label = "商品分类" label-width = "80px">
+            <template>
+                <el-select v-model = "product.categoryId" placeholder = "请选择">
+                    <!--:label显示的值 :value 提交的值-->
+                   <el-option v-for="c in categoryArr" :label="c.name" :value="c.id"></el-option>
+                </el-select>
+            </template>
+        </el-form-item>
+
+        <el-form-item label = "商品图片" label-width = "80px">
+            <el-upload
+                    action="/banner/upload"
+                    name = "picFile"
+                    :limit = "1"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove"
+                    :on-success = "handleSuccess"
+            >
+                <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+        </el-form-item>
+    </el-form>
+
+
+   <!-- <input type="button" value="发布" @click="insert()">-->
+
+    <el-button @click="insert()">发布</el-button>
+
+</el-card>
+
+</div>
+
+<style>
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+</style>
+
+<script src="js/vue.js"></script>
+<script src="js/eui.js"></script>
+<script src="js/axios.min.js"></script>
+
+<script>
+    let v = new Vue({
+        el :"#app",
+        data:function () {
+            return {
+                dialogImageUrl: '',
+                dialogVisible: false,
+                product:{
+                    title:"",
+                    url:"",
+                    price:"",
+                    oldPrice:"",
+                    saleCount:"",
+                    categoryId:""
+                },
+                categoryArr:[]
+
+            };
+        },
+        methods: {
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+                console.log(file.response);
+                axios.get("/banner/delete?filename="+file.response).then(function (){
+                    console.log("删除成功!"+file.response);
+                    v.banner.url = "";
+                    }
+                )
+
+            },
+
+            insert(){
+                console.log(v.product.url)
+              if (v.product.url == ""){
+
+                  alert("图片不能为空");
+                  return ;
+              }
+              axios.post("/product/insert",v.product).then(function (){
+                      alert("添加完成");
+                      location.href = "/admin.html";//显示首页
+              })
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            handleSuccess(response,file,fileList){
+                console.log("文件上传完成,图片名 = "+response);
+                    v.product.url =  response;
+            },
+            goBack(){
+                //返回上一个页面
+                history.back();
+            }
+
+
+        },
+
+        created:function (){
+            //发送请求获取所有的分类信息
+            axios.get("category/select").then(function (response){
+                v.categoryArr = response.data;
+            })
+        }
+    })
+</script>
+</body>
+</html>

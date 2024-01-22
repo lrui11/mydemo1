@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/eui.css">
+    <style>
+        body {
+            margin: 0;
+            background-image: url("imgs/bg.jpg");
+            background-size: cover; /* cover是专门用来设置全屏背景的 */
+            text-align: center;
+        }
+        h1 {
+            font-size: 72px;
+            color: rgb(0,150,215);
+            margin-bottom: 0;
+        }
+        img {
+            width: 100px;
+        }
+        h2 {
+            font-size: 32px;
+            color: #0095d7;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1>欢迎来到酷鲨商城</h1>
+    <img src="imgs/shark.png">
+    <h2>CoolSharkMall</h2>
+    <el-card style="width: 600px;height: 300px;margin: 0 auto;background-color: rgba(255,255,255,0.3)">
+        <el-form style="width: 400px;margin: 30px auto" label-width="60px">
+            <el-form-item label="用户名">
+                <el-input type="text" v-model="user.username" placeholder="请输入用户名"></el-input>
+            </el-form-item>
+            <el-form-item label="密码">
+                <el-input type="password" v-model="user.password" placeholder="请输入密码"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" style="position: relative;right: 35px" @click="login()">登录</el-button>
+            </el-form-item>
+
+           <!-- <template>
+                <el-button :plain="false" @click="open2">成功</el-button>
+                <el-button :plain="true" @click="open3">警告</el-button>
+                <el-button :plain="true" @click="open1">消息</el-button>
+                <el-button :plain="true" @click="open4">错误</el-button>
+            </template>-->
+
+        </el-form>
+    </el-card>
+</div>
+</body>
+
+<script src="js/vue.js"></script>
+<script src="js/eui.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+   let v = new Vue({
+       el:"#app",
+       data:{
+           user:{
+               username:"",
+               password:""
+           }
+       },
+       methods:{
+           login(){
+               axios.post("/login",v.user).then(function (response){
+                   console.log(response.data);
+                   if(response.data == 1){
+                       alert("登录成功");
+                       location.href = "/admin.html";
+                   }else if(response.data ==3){
+                       //alert("密码错误");
+                       v.$message.error("密码错误")
+                   }else {
+                       v.$message.error("用户不存在")
+                       //alert("用户不存在");
+
+                   }
+               })
+           }
+       }
+   })
+</script>
+</html>
