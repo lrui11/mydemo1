@@ -12,6 +12,7 @@ public class Product {
     private Integer saleCount;//销量
     private String categoryId;
     private Date created;
+    private String name;
 
     public String getCategoryId() {
         return categoryId;
